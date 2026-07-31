@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบสื่อการสอนอัจฉริยะ ป.1</title>
+    <title>ระบบสื่อการสอนอัจฉริยะ AI</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
     <style>
         :root { --primary-red: #7f0101; --bg-color: #f4f6f9; --white: #ffffff; --text-dark: #333; --text-gray: #666; }
@@ -16,7 +14,7 @@
         .view-section { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
         .view-section.active { display: flex; flex-direction: column; justify-content: center; align-items: center; }
         
-        /* --- Landing Page & Top Bar --- */
+        /* --- Landing Page --- */
         #view-landing { background-color: var(--white); z-index: 10; }
         .top-bar { position: absolute; top: 20px; right: 30px; display: flex; gap: 20px; align-items: center; }
         .lang-btn { background: #eee; border: none; padding: 5px 15px; border-radius: 20px; cursor: pointer; font-family: 'Sarabun'; }
@@ -30,7 +28,7 @@
         .landing-title h2 { color: var(--text-gray); font-size: 18px; font-weight: 400; line-height: 1.5; }
         
         .manual-group { display: flex; gap: 15px; margin-bottom: 30px; }
-        .btn-manual { background: #fff; border: 2px solid var(--primary-red); color: var(--primary-red); padding: 8px 20px; border-radius: 8px; cursor: pointer; }
+        .btn-manual { background: #fff; border: 2px solid var(--primary-red); color: var(--primary-red); padding: 8px 20px; border-radius: 8px; cursor: pointer; font-family: 'Sarabun'; font-size: 16px; }
         .btn { padding: 12px 35px; font-size: 18px; font-family: 'Sarabun'; font-weight: 600; border: none; border-radius: 50px; cursor: pointer; transition: 0.3s; }
         .btn-enter { background-color: var(--primary-red); color: var(--white); box-shadow: 0 10px 20px rgba(127, 1, 1, 0.2); }
 
@@ -39,17 +37,17 @@
         .app-header { padding: 15px 30px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; }
         .app-title-group { display: flex; align-items: center; }
         .app-logo { width: 45px; height: 45px; background: var(--primary-red); border-radius: 50%; margin-right: 15px; }
-        .step-content { flex-grow: 1; padding: 20px 40px; display: none; flex-direction: column; overflow-y: auto;}
+        .step-content { flex-grow: 1; padding: 20px 40px; display: none; flex-direction: column; overflow-y: auto; position: relative; }
         .step-content.active { display: flex; }
         .step-header h2 { font-size: 24px; }
         .step-desc { font-size: 16px; color: var(--primary-red); background: #fdf2f2; padding: 8px 15px; border-radius: 8px; display: inline-block; margin-top: 5px; border-left: 4px solid var(--primary-red); margin-bottom: 15px;}
-        .video-container { width: 100%; flex-grow: 1; background-color: #000; border-radius: 12px; position: relative; }
+        .video-container { width: 100%; flex-grow: 1; background-color: #000; border-radius: 12px; position: relative; display: flex; justify-content: center; align-items: center; color: white;}
         .nav-bar { padding: 20px 40px; display: flex; justify-content: space-between; border-top: 1px solid #eee; }
         .btn-prev { background: #eee; color: #666; }
         .btn-next { background: var(--primary-red); color: white; }
 
         /* --- Popup ด่าน 4 --- */
-        #game-popup { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; display: flex; justify-content: center; align-items: center; border-radius: 20px; }
+        #game-popup { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; display: flex; justify-content: center; align-items: center; border-radius: 12px; }
         .popup-box { background: white; padding: 30px; border-radius: 16px; width: 400px; text-align: center; }
         .popup-box input, .popup-box select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Sarabun'; font-size: 16px; }
 
@@ -60,16 +58,6 @@
         .ai-input-group { display: flex; border-top: 1px solid #ddd; }
         .ai-input-group input { flex-grow: 1; padding: 10px; border: none; outline: none; font-family: 'Sarabun'; }
         .ai-input-group button { background: var(--primary-red); color: white; border: none; padding: 0 15px; cursor: pointer; }
-
-        /* --- Admin --- */
-        #view-admin-dashboard { background-color: #f8f9fa; flex-direction: row; align-items: flex-start; justify-content: flex-start; }
-        .admin-sidebar { width: 250px; background: var(--primary-red); color: white; height: 100vh; padding: 20px; position: fixed; left: 0; top: 0; }
-        .admin-content { margin-left: 250px; padding: 40px; width: calc(100% - 250px); height: 100vh; overflow-y: auto; }
-        .admin-card { background: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; border: 1px solid #eee; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; }
-        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-family: 'Sarabun'; }
-        .btn-save { background: var(--primary-red); color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -78,7 +66,7 @@
     <div id="view-landing" class="view-section active">
         <div class="top-bar">
             <button class="lang-btn" onclick="toggleLang()">TH / EN</button>
-            <a href="#" class="admin-link-small" onclick="switchView('view-admin-login')">👁️ เข้าสู่ระบบฐานข้อมูล</a>
+            <a href="#" class="admin-link-small" onclick="alert('ไปหน้า Admin (ทดสอบ)')">👁️ เข้าระบบฐานข้อมูล</a>
         </div>
         
         <div class="main-logos">
@@ -90,10 +78,10 @@
             <h2 id="t-h2">โรงเรียนบ้านหาดส้มแป้น | สำหรับนักเรียนชั้นประถมศึกษาปีที่ 1<br>สำนักงานเขตพื้นที่การศึกษาประถมศึกษาชุมพร เขต 1</h2>
         </div>
         <div class="manual-group">
-            <button class="btn-manual">📖 คู่มือสำหรับครู</button>
-            <button class="btn-manual">👦 คู่มือสำหรับนักเรียน</button>
+            <button class="btn-manual" id="btn-manual-t">📖 คู่มือสำหรับครู</button>
+            <button class="btn-manual" id="btn-manual-s">👦 คู่มือสำหรับนักเรียน</button>
         </div>
-        <button class="btn btn-enter" onclick="switchView('view-app')">เข้าสู่บทเรียน ➔</button>
+        <button class="btn btn-enter" id="btn-enter-app" onclick="switchView('view-app')">เข้าสู่บทเรียน ➔</button>
     </div>
 
     <!-- 2. Application -->
@@ -106,25 +94,37 @@
                 </div>
             </div>
 
+            <!-- ด่าน 1 -->
             <div class="step-content active" id="step-1">
-                <div class="step-header"><h2>ด่านที่ 1 : มาทำความรู้จักกันเถอะ</h2></div>
-                <div class="video-container" style="background:#000;">[วิดีโอ 1]</div>
+                <div class="step-header"><h2>ด่านที่ 1 : มาทำความรู้จักกันเถอะ</h2><div class="step-desc">ขั้นที่ 1 สร้างความสนใจ (Engagement)</div></div>
+                <div class="video-container">[พื้นที่วิดีโอ 1]</div>
             </div>
 
-            <!-- ด่านที่ 4 -->
-            <div class="step-content" id="step-4" style="position: relative;">
+            <!-- ด่าน 2 -->
+            <div class="step-content" id="step-2">
+                <div class="step-header"><h2>ด่านที่ 2 : ฝึกอ่านสะกดคำกันเถอะ</h2><div class="step-desc">ขั้นที่ 2-3 สำรวจและอธิบาย (Exploration & Explanation)</div></div>
+                <div class="video-container">[พื้นที่วิดีโอ 2]</div>
+            </div>
+
+            <!-- ด่าน 3 -->
+            <div class="step-content" id="step-3">
+                <div class="step-header"><h2>ด่านที่ 3 : นิทานแสนสนุก</h2><div class="step-desc">ขั้นที่ 4 ขยายความรู้ (Elaboration)</div></div>
+                <div class="video-container">[พื้นที่วิดีโอ 3]</div>
+            </div>
+
+            <!-- ด่าน 4 -->
+            <div class="step-content" id="step-4">
                 <div class="step-header">
                     <h2>ด่านที่ 4 : เกมทบทวนความรู้</h2>
                     <div class="step-desc">ขั้นที่ 5 ประเมินผล (Evaluation)</div>
                 </div>
                 
-                <!-- กล่องแสดงเกม (จะถูกซ่อนไว้จนกว่าจะกรอกรหัสผ่าน) -->
-                <div id="game-display-area" style="width: 100%; height: 400px; background: #eee; display: none; justify-content: center; align-items: center;">
-                    [พื้นที่แสดงเกม (ดึงจากแอดมิน)]
+                <div id="game-display-area" style="width: 100%; height: 400px; background: #eee; display: none; justify-content: center; align-items: center; border-radius: 12px; font-size: 20px;">
+                    [ดึงเกมที่ฝังไว้ หรือ แบบทดสอบมาแสดงตรงนี้]
                 </div>
 
-                <!-- ป๊อปอัปกรอกรหัสก่อนเริ่มด่าน 4 -->
-                <div id="game-popup">
+                <!-- Popup เฉพาะของด่าน 4 -->
+                <div id="game-popup" style="display: none;">
                     <div class="popup-box">
                         <h3 style="color: var(--primary-red); margin-bottom: 20px;">ก่อนเริ่มเกม กรุณากรอกข้อมูล</h3>
                         <input type="text" id="s-name" placeholder="ชื่อ-นามสกุล นักเรียน">
@@ -132,20 +132,16 @@
                             <option value="">-- เลือกห้องเรียน --</option>
                             <option value="ป.1/1">ป.1/1</option>
                             <option value="ป.1/2">ป.1/2</option>
-                            <option value="ป.1/3">ป.1/3</option>
                         </select>
                         <input type="text" id="t-code" placeholder="รหัสคุณครู (เช่น 1234)">
                         <button class="btn-enter btn" style="width: 100%; margin-top: 10px;" onclick="startGame()">เริ่มเล่นเกมเลย!</button>
-                        <p style="font-size: 12px; color: #888; margin-top: 10px;">*รหัสคุณครูใช้สำหรับส่งคะแนนให้ถูกห้อง</p>
                     </div>
                 </div>
 
-                <!-- AI Chatbot (แสดงเฉพาะด่าน 4) -->
+                <!-- AI Chatbot เฉพาะด่าน 4 -->
                 <div id="ai-widget">
                     <div class="ai-header">🤖 ผู้ช่วย AI ใบ้คำ</div>
-                    <div class="ai-body" id="ai-chat-box">
-                        สวัสดีจ้ะ! ติดตรงไหนพิมพ์ถามพี่ AI ได้เลยนะ พี่บอกคำใบ้ให้
-                    </div>
+                    <div class="ai-body" id="ai-chat-box">สวัสดีจ้ะ! ติดตรงไหนพิมพ์ถามพี่ AI ได้เลยนะ พี่บอกคำใบ้ให้</div>
                     <div class="ai-input-group">
                         <input type="text" id="ai-input" placeholder="พิมพ์ถามตรงนี้...">
                         <button onclick="askAI()">ส่ง</button>
@@ -153,6 +149,7 @@
                 </div>
             </div>
 
+            <!-- ปุ่มเปลี่ยนด่าน -->
             <div class="nav-bar">
                 <button class="btn btn-prev" id="btn-prev" onclick="changeStep(-1)" style="visibility: hidden;">ย้อนกลับ</button>
                 <button class="btn btn-next" id="btn-next" onclick="changeStep(1)">ถัดไป ➔</button>
@@ -160,111 +157,51 @@
         </div>
     </div>
 
-    <!-- 3. Admin Login -->
-    <div id="view-admin-login" class="view-section" style="background: var(--primary-red);">
-        <div class="popup-box" style="width: 350px;">
-            <h2 style="color: var(--primary-red); margin-bottom: 20px;">👁️ เข้าสู่ระบบ Admin</h2>
-            <input type="password" id="admin-pass" placeholder="รหัสผ่าน">
-            <button class="btn-enter btn" style="width: 100%;" onclick="loginAdmin()">เข้าระบบ</button>
-            <a href="#" style="display: block; margin-top: 15px; color: #666;" onclick="switchView('view-landing')">ยกเลิก</a>
-        </div>
-    </div>
-
-    <!-- 4. Admin Dashboard -->
-    <div id="view-admin-dashboard" class="view-section">
-        <div class="admin-sidebar">
-            <h2>⚙️ AI Admin Panel</h2>
-            <ul>
-                <li style="padding: 10px 0; cursor: pointer;">📺 จัดการสื่อและเกม</li>
-                <li style="padding: 10px 0; cursor: pointer;">🤖 ตั้งค่าคำใบ้ AI</li>
-            </ul>
-            <button onclick="switchView('view-landing')" style="position: absolute; bottom: 20px; width: 80%; padding: 10px; border-radius: 5px; border:none; cursor: pointer;">ออกจากระบบ</button>
-        </div>
-        
-        <div class="admin-content">
-            <h1>จัดการด่านที่ 4 (เกมประเมินผล)</h1>
-            <div class="admin-card">
-                <div class="form-group">
-                    <label>รูปแบบเกมที่ต้องการใช้:</label>
-                    <select id="game-type" onchange="toggleGameSetting()">
-                        <option value="embed">ใช้โค้ดฝังเกม (เช่น Kahoot, Wordwall)</option>
-                        <option value="custom">สร้างคำถามเองในระบบ (รองรับ 10 ข้อ)</option>
-                    </select>
-                </div>
-                
-                <!-- ส่วนสำหรับใส่โค้ดฝัง -->
-                <div id="setting-embed" class="form-group">
-                    <label>วางโค้ดฝัง (Iframe):</label>
-                    <textarea rows="3" placeholder="<iframe src='...'>"></textarea>
-                </div>
-
-                <!-- ส่วนสำหรับสร้างคำถามเอง -->
-                <div id="setting-custom" style="display: none; background: #f4f6f9; padding: 20px; border-radius: 8px;">
-                    <h3 style="margin-bottom: 15px;">ข้อที่ 1</h3>
-                    <div class="form-group"><label>รููปภาพคำถาม (URL):</label><input type="text"></div>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="text" placeholder="ช้อยส์ที่ 1">
-                        <input type="text" placeholder="ช้อยส์ที่ 2">
-                        <input type="text" placeholder="ช้อยส์ที่ 3">
-                    </div>
-                    <button style="margin-top: 15px; background: #28a745; color: white; border: none; padding: 5px 15px; border-radius: 4px; cursor: pointer;">+ เพิ่มคำถามข้อต่อไป</button>
-                </div>
-            </div>
-
-            <h1>จัดการผู้ช่วย AI (ด่านที่ 4)</h1>
-            <div class="admin-card">
-                <div class="form-group">
-                    <label>ป้อนความรู้/คำสั่งพื้นฐานให้ AI (System Prompt):</label>
-                    <textarea rows="4" placeholder="เช่น ถ้าเด็กถามเรื่องอักษรสูง ให้ใบ้ว่า ผีฝากถุงข้าวสารให้หมอ..."></textarea>
-                    <p style="font-size: 12px; color: #888; margin-top: 5px;">*ข้อมูลตรงนี้จะถูกส่งไปให้ AI ประมวลผลเพื่อใบ้คำให้นักเรียน</p>
-                </div>
-                <button class="btn-save">บันทึกข้อมูลทั้งหมด</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        /* สลับหน้า */
         function switchView(id) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.getElementById(id).classList.add('active');
         }
 
-        /* เข้าแอดมิน */
-        function loginAdmin() {
-            if(document.getElementById('admin-pass').value !== '') {
-                switchView('view-admin-dashboard');
-                document.getElementById('admin-pass').value = '';
+        /* --- ระบบเปลี่ยนด่านที่แก้ไขบั๊กแล้ว --- */
+        let currentStep = 1;
+        function changeStep(dir) {
+            // ซ่อนหน้าเดิม
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            
+            // บวก/ลบ ด่าน (ทีละ 1 ด่านเท่านั้น ไม่มีข้าม)
+            currentStep += dir; 
+            
+            // โชว์หน้าใหม่
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+            
+            // จัดการปุ่ม ย้อนกลับ/ถัดไป
+            document.getElementById('btn-prev').style.visibility = currentStep === 1 ? 'hidden' : 'visible';
+            document.getElementById('btn-next').style.display = currentStep === 4 ? 'none' : 'block';
+
+            // *** ถ้ามาถึงด่าน 4 ให้เด้ง Popup ขึ้นมา ***
+            if(currentStep === 4) {
+                document.getElementById('game-popup').style.display = 'flex';
+                document.getElementById('game-display-area').style.display = 'none';
+                document.getElementById('ai-widget').style.display = 'none';
+            } else {
+                // ถ้ากดถัดกลับไปด่านอื่น ต้องซ่อน Popup และ AI ทิ้ง
+                document.getElementById('game-popup').style.display = 'none';
+                document.getElementById('ai-widget').style.display = 'none';
             }
         }
 
-        /* เปลี่ยนด่าน */
-        let currentStep = 1;
-        function changeStep(dir) {
-            document.getElementById(`step-${currentStep}`).classList.remove('active');
-            currentStep += dir;
-            // ทดสอบกระโดดไปด่าน 4 เลย
-            if(dir > 0 && currentStep === 2) currentStep = 4; 
-            
-            document.getElementById(`step-${currentStep}`).classList.add('active');
-            document.getElementById('btn-prev').style.visibility = currentStep === 1 ? 'hidden' : 'visible';
-            document.getElementById('btn-next').style.display = currentStep === 4 ? 'none' : 'block';
-        }
-
-        /* เริ่มเกมในด่าน 4 */
+        /* --- ระบบด่าน 4 --- */
         function startGame() {
             const code = document.getElementById('t-code').value;
             if(!code) { alert("อย่าลืมใส่รหัสคุณครูนะครับ!"); return; }
             
-            // ปิดป๊อปอัป โชว์เกม และโชว์ AI
+            // ปิด Popup แล้วโชว์เกมกับ AI
             document.getElementById('game-popup').style.display = 'none';
             document.getElementById('game-display-area').style.display = 'flex';
             document.getElementById('ai-widget').style.display = 'flex';
-            
-            alert(`เชื่อมต่อฐานข้อมูลของรหัสครู ${code} เรียบร้อย!`);
         }
 
-        /* จำลอง AI Chatbot */
         function askAI() {
             const input = document.getElementById('ai-input');
             const box = document.getElementById('ai-chat-box');
@@ -277,19 +214,17 @@
             }, 1000);
         }
 
-        /* เปลี่ยน UI ตั้งค่าเกม */
-        function toggleGameSetting() {
-            const type = document.getElementById('game-type').value;
-            document.getElementById('setting-embed').style.display = type === 'embed' ? 'block' : 'none';
-            document.getElementById('setting-custom').style.display = type === 'custom' ? 'block' : 'none';
-        }
-
-        /* สลับภาษา */
+        /* --- ระบบเปลี่ยนภาษาที่สมบูรณ์ --- */
         let isThai = true;
         function toggleLang() {
             isThai = !isThai;
+            // เปลี่ยนหัวข้อ
             document.getElementById('t-h1').innerText = isThai ? "นวัตกรรมการจัดการเรียนรู้ด้วยปัญญาประดิษฐ์ (AI)" : "AI Educational Innovation Platform";
-            document.getElementById('t-h2').innerHTML = isThai ? "โรงเรียนบ้านหาดส้มแป้น | สำหรับนักเรียนชั้นประถมศึกษาปีที่ 1" : "Ban Had Som Pan School | For Grade 1 Students";
+            document.getElementById('t-h2').innerHTML = isThai ? "โรงเรียนบ้านหาดส้มแป้น | สำหรับนักเรียนชั้นประถมศึกษาปีที่ 1<br>สำนักงานเขตพื้นที่การศึกษาประถมศึกษาชุมพร เขต 1" : "Ban Had Som Pan School | For Grade 1 Students<br>Chumphon Primary Educational Service Area Office 1";
+            // เปลี่ยนปุ่มคู่มือ และ ปุ่มเข้าสู่บทเรียน
+            document.getElementById('btn-manual-t').innerHTML = isThai ? "📖 คู่มือสำหรับครู" : "📖 Teacher Manual";
+            document.getElementById('btn-manual-s').innerHTML = isThai ? "👦 คู่มือสำหรับนักเรียน" : "👦 Student Manual";
+            document.getElementById('btn-enter-app').innerText = isThai ? "เข้าสู่บทเรียน ➔" : "Enter Lesson ➔";
         }
     </script>
 </body>
